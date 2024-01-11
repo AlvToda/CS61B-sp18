@@ -161,6 +161,9 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
     @Override
     public T peek() {
         /* TODO: Your code here! */
+        if(size==0){
+            return null;
+        }
         return contents[1].item();
     }
 
@@ -177,6 +180,9 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
     public T removeMin() {
         /* TODO: Your code here! */
         T min=peek();
+        if (min==null){
+            return min;
+        }
         //将最后一个交换到最顶端
         swap(1,size);
         //删除最后一个位置的值
@@ -207,6 +213,9 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
     @Override
     public void changePriority(T item, double priority) {
         /* TODO: Your code here! */
+        if(size==0){
+            return;
+        }
         for(int i=1;i<=size;i++){
             if(contents[i].item().equals(item)){
                 contents[i].myPriority=priority;
