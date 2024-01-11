@@ -28,7 +28,7 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
      */
     private static int leftIndex(int i) {
         /* TODO: Your code here! */
-        return 0;
+        return 2*i;
     }
 
     /**
@@ -36,7 +36,7 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
      */
     private static int rightIndex(int i) {
         /* TODO: Your code here! */
-        return 0;
+        return 2*i+1;
     }
 
     /**
@@ -44,7 +44,7 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
      */
     private static int parentIndex(int i) {
         /* TODO: Your code here! */
-        return 0;
+        return i/2;
     }
 
     /**
@@ -108,7 +108,12 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
         validateSinkSwimArg(index);
 
         /** TODO: Your code here. */
-        return;
+        //只要它没有达到堆顶，以及还是比父节点小，就不断与父节点进行交换
+        while(index>1 && min(index,parentIndex(index))==index){
+            swap(index,parentIndex(index));
+            index=parentIndex(index);
+        }
+
     }
 
     /**
@@ -119,7 +124,13 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
         validateSinkSwimArg(index);
 
         /** TODO: Your code here. */
-        return;
+        while(index<=size && leftIndex(index)<=size &&
+                min(min(index,leftIndex(index)),min(index,rightIndex(index)))!=index){
+            //如果得到的最小的并不是index，此时要和最小的哪个进行交换
+            int i=min(min(index,leftIndex(index)),min(index,rightIndex(index)));
+            swap(i,index);
+            index=i;
+        }
     }
 
     /**
@@ -134,6 +145,13 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
         }
 
         /* TODO: Your code here! */
+        //size+1
+        size+=1;
+        //在size内加入节点Node
+        Node n=new Node(item, priority);
+        contents[size]=n;
+        //swim
+        swim(size);
     }
 
     /**
@@ -143,7 +161,7 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
     @Override
     public T peek() {
         /* TODO: Your code here! */
-        return null;
+        return contents[1].item();
     }
 
     /**
@@ -158,7 +176,15 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
     @Override
     public T removeMin() {
         /* TODO: Your code here! */
-        return null;
+        T min=peek();
+        //将最后一个交换到最顶端
+        swap(1,size);
+        //删除最后一个位置的值
+        contents[size]=null;
+        size-=1;
+        //对顶端的节点进行sink
+        sink(1);
+        return min;
     }
 
     /**
@@ -181,7 +207,14 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
     @Override
     public void changePriority(T item, double priority) {
         /* TODO: Your code here! */
-        return;
+        for(int i=1;i<=size;i++){
+            if(contents[i].item().equals(item)){
+                contents[i].myPriority=priority;
+                sink(i);
+                swim(i);
+                return;
+            }
+        }
     }
 
     /**
@@ -378,9 +411,10 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
         pq.insert("b", 2);
         pq.insert("c", 3);
         pq.insert("d", 4);
-        String removed = pq.removeMin();
-        assertEquals("a", removed);
+        pq.changePriority("a",10);
+        //assertEquals("a", removed);
         assertEquals(9, pq.size());
+        assertEquals("a", pq.contents[9].myItem);
         assertEquals("b", pq.contents[1].myItem);
         assertEquals("c", pq.contents[2].myItem);
         assertEquals("e", pq.contents[3].myItem);
@@ -389,7 +423,7 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
         assertEquals("h", pq.contents[6].myItem);
         assertEquals("g", pq.contents[7].myItem);
         assertEquals("i", pq.contents[8].myItem);
-        assertEquals("d", pq.contents[9].myItem);
+        //assertEquals("d", pq.contents[9].myItem);
     }
 
     @Test
@@ -412,6 +446,33 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
             assertEquals(expected[i], pq.removeMin());
             i += 1;
         }
+    }
+
+    @Test
+    public void testChangePriority() {
+        ArrayHeap<String> pq = new ArrayHeap<>();
+        pq.insert("c", 3);
+        pq.insert("i", 9);
+        pq.insert("g", 7);
+        pq.insert("d", 4);
+        pq.insert("a", 1);
+        pq.insert("h", 8);
+        pq.insert("e", 5);
+        pq.insert("b", 2);
+        pq.insert("c", 3);
+        pq.insert("d", 4);
+        String removed = pq.removeMin();
+        assertEquals("a", removed);
+        assertEquals(9, pq.size());
+        assertEquals("b", pq.contents[1].myItem);
+        assertEquals("c", pq.contents[2].myItem);
+        assertEquals("e", pq.contents[3].myItem);
+        assertEquals("c", pq.contents[4].myItem);
+        assertEquals("d", pq.contents[5].myItem);
+        assertEquals("h", pq.contents[6].myItem);
+        assertEquals("g", pq.contents[7].myItem);
+        assertEquals("i", pq.contents[8].myItem);
+        assertEquals("d", pq.contents[9].myItem);
     }
 
 }
